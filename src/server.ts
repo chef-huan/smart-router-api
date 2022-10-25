@@ -1,6 +1,6 @@
 import express from "express";
 import * as dotenv from "dotenv";
-import { QuoteRequest } from "./model";
+import { getPairsV2Combined, getAllPairsStableSwap } from "./service/pairs";
 
 dotenv.config();
 
@@ -12,10 +12,25 @@ app.use(express.json());
 
 //TODO add body validation
 app.post("/check-price", async (req, res) => {
-  console.log(req.body.toString());
+  // try {
+  //   const pairs = await getAllPairsStableSwap();
+  // } catch (error) {
+  //   console.log(`Error STABLE_SWAP`, error);
+  // }
 
-  const msg: QuoteRequest = req.body;
-  console.log(msg);
+  // try {
+  //   const pairs = await getAllPairsV2();
+  // } catch (error) {
+  //   console.log(`Error PAIRS`, error);
+  // }
+
+  try {
+    const poorPairs = await getPairsV2Combined();
+  } catch (error) {
+    console.log(`Error SF`, error);
+  }
+
+  res.status(200).json({ message: "done" });
 });
 
 app.listen(process.env.PORT || 8080, () => {

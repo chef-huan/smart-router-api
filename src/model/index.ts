@@ -1,4 +1,3 @@
-
 export type QuoteRequest = {
   // 1 for ETH L1
   networkId: number;
