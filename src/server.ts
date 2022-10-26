@@ -1,6 +1,7 @@
 import express from "express";
 import * as dotenv from "dotenv";
 import { getPairsV2Combined, getAllPairsStableSwap } from "./service/pairs";
+import { getPairPriceV2 } from "./service/onchain/price";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.post("/check-price", async (req, res) => {
 
   try {
     const poorPairs = await getPairsV2Combined();
+    await getPairPriceV2(poorPairs);
   } catch (error) {
     console.log(`Error SF`, error);
   }

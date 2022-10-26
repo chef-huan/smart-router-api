@@ -1,12 +1,10 @@
+import { BigNumber, FixedNumber } from "ethers";
+
 export interface Pair {
   id: string;
-  reserve0: string;
-  reserve1: string;
-  reserveUSD: string;
   volumeUSD: string;
-  token0Price: string;
-  token1Price: string;
   trackedReserveBNB: string;
+  block: string;
   token0: {
     id: string;
     symbol: string;
@@ -17,6 +15,14 @@ export interface Pair {
     symbol: string;
     name: string;
   };
+}
+
+export interface PairWithPrice extends Pair {
+  token0price: FixedNumber;
+  token1price: FixedNumber;
+
+  reserve0: FixedNumber;
+  reserve1: FixedNumber;
 }
 
 export interface PairQueryResponse {

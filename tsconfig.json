@@ -1,23 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2017",
     "module": "commonjs",
-    "moduleResolution": "node",
-    "rootDir": "./src",
-    "outDir": "./build",
-    "strict": true,
-    "sourceMap": true,
-    "composite": false,
-    "declaration": true,
-    "declarationMap": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSources": false,
-    "isolatedModules": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "skipLibCheck": true
+    "target": "es6",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "outDir": "build"
   },
   "exclude": [
     "node_modules"
