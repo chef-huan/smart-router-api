@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 import { infoClient } from "../../utils/subgraph/subgraphClient";
 import { SUBGRAPH_URL } from "../../utils/constants";
-import { Pair, PairQueryResponse } from "../../model/pairs";
+import { Pair, PairQueryResponse, PairType } from "../../model/pairs";
 
 export const getPairsPagesById = async (ids: string[]) => {
   const { data } = await infoClient(
@@ -112,5 +112,8 @@ export const getAllPairsV2 = async (): Promise<Pair[]> => {
     );
   }
 
-  return pairs;
+  return pairs.map((pair) => {
+    pair.type = PairType.V2;
+    return pair;
+  });
 };

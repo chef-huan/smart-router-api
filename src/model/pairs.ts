@@ -1,10 +1,16 @@
-import { BigNumber, FixedNumber } from "ethers";
+import { FixedNumber } from "ethers";
+
+export enum PairType {
+  V2,
+  STABLE_SWAP,
+}
 
 export interface Pair {
   id: string;
   volumeUSD: string;
   trackedReserveBNB: string;
   block: string;
+  type: PairType;
   token0: {
     id: string;
     symbol: string;
