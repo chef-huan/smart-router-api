@@ -1,10 +1,38 @@
-import { Pair, PairWithPrice } from "../../model/pairs";
-import { multicallv2 } from "../../utils/onchain/multicall";
-import StableSwapPairAbi from "../../abi/StableSwapPair.json";
+import { PairWithPrice } from "../../model/pairs";
+import { multicallv2 } from "../../../common/utils/onchain/multicall";
+import StableSwapPairAbi from "../../../abi/StableSwapPair.json";
 import { BigNumber, FixedNumber } from "ethers";
-import { MultiCall } from "../../model/multicall";
+import { MultiCall, Pair } from "../../../common/model";
 
 export const getPairPriceStableSwap = async (
+  pairAddress: string,
+  amountIn?: string,
+  amountOut?: string
+): Promise<string> => {
+  const call: MultiCall = {
+    address: pairAddress,
+    name: "get_dy",
+    params: [
+      amountIn ? "0" : "1",
+      amountOut ? "0" : "1",
+      amountIn || amountOut,
+    ],
+  };
+
+  console.log({ call });
+
+  const pairStableSwapMultiCallResult = await multicallv2<BigNumber[]>(
+    StableSwapPairAbi,
+    [call],
+    {
+      requireSuccess: true,
+    }
+  );
+
+  return pairStableSwapMultiCallResult.toString();
+};
+
+export const getPairsPriceStableSwap = async (
   pairs: Pair[]
 ): Promise<PairWithPrice[]> => {
   const poolInfoCalls: MultiCall[] = pairs.flatMap((pair) => [

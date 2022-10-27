@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { getMulticallContract } from "./getContract";
-import { MultiCall, MultiCallOptions } from "../../model/multicall";
+import { MultiCall, MultiCallOptions } from "../../model";
 
 /**
  * Multicall V2 uses the new "tryAggregate" function. It is different in 2 ways
@@ -21,10 +21,14 @@ export const multicallv2 = async <T>(
     target: call.address.toLowerCase(),
     callData: itf.encodeFunctionData(call.name, call.params),
   }));
-  const returnData = await multi.tryAggregate(requireSuccess || true, calldata);
+  const returnData = await multi.tryAggregate(requireSuccess, calldata);
   const res = returnData.map((call, i) => {
     const [result, data] = call;
-    return result ? itf.decodeFunctionResult(calls[i].name, data) : null;
+    try {
+      return result ? itf.decodeFunctionResult(calls[i].name, data) : null;
+    } catch (err) {
+      return null;
+    }
   });
 
   return res as unknown as T;

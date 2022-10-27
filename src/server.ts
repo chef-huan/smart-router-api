@@ -1,7 +1,13 @@
 import express from "express";
 import * as dotenv from "dotenv";
-import { getPairsV2Combined, getAllPairsStableSwap } from "./service/pairs";
-import { getPairPriceV2, getPairPriceStableSwap } from "./service/onchain";
+import {
+  getPairsV2Combined,
+  getAllPairsStableSwap,
+} from "./strategyV2/service/pairs";
+import {
+  getPairPriceV2,
+  getPairsPriceStableSwap,
+} from "./strategyV2/service/onchain";
 
 dotenv.config();
 
@@ -12,10 +18,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 //TODO add body validation
-app.post("/check-price", async (req, res) => {
+app.post("/v2/check-price", async (req, res) => {
   try {
     const pairs = await getAllPairsStableSwap();
-    const pairsWithPrice = await getPairPriceStableSwap(pairs);
+    const pairsWithPrice = await getPairsPriceStableSwap(pairs);
     console.log(pairsWithPrice[0]);
   } catch (error) {
     console.log(`Error STABLE_SWAP`, error);
@@ -29,6 +35,11 @@ app.post("/check-price", async (req, res) => {
     console.log(`Error SF`, error);
   }
 
+  res.status(200).json({ message: "done" });
+});
+
+//TODO add body validation
+app.post("/v1/check-price", async (req, res) => {
   res.status(200).json({ message: "done" });
 });
 

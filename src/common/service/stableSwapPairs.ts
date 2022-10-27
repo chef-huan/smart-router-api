@@ -1,7 +1,8 @@
 import { gql } from "graphql-request";
-import { infoClient } from "../../utils/subgraph/subgraphClient";
-import { SUBGRAPH_URL } from "../../utils/constants";
-import { Pair, PairQueryResponse, PairType } from "../../model/pairs";
+import { infoClient } from "../utils/subgraph/subgraphClient";
+import { SUBGRAPH_URL } from "../utils/constants";
+import { PairQueryResponse } from "../../strategyV2/model/pairs";
+import { Pair, PairType } from "../model";
 
 const getPairsFirstPage = async (): Promise<Pair[]> => {
   const { data } = await infoClient(SUBGRAPH_URL.STABLE_SWAP)

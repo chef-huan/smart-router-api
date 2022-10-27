@@ -1,14 +1,13 @@
-import { Pair } from "../../model/pairs";
+import { Pair } from "../../../common/model/pairs";
 import { getAllPairsV2SF } from "./v2PairsSteamingFast";
-import chunk from "../../utils/chunk";
 import { getPairsPagesById } from "./v2Pairs";
-
-export * from "./stableSwapPairs";
+import { chunk } from "lodash";
+export * from "../../../common/service/stableSwapPairs";
 
 export const getPairsV2Combined = async (): Promise<Pair[]> => {
   const poorPairs = await getAllPairsV2SF();
   let pairs: Pair[] = [];
-  for (const pairChunk of chunk(poorPairs, 1000)) {
+  for (const pairChunk of chunk<Pair>(poorPairs, 1000)) {
     const pairsWithToken = await getPairsPagesById(
       pairChunk.map((el) => el.id)
     );

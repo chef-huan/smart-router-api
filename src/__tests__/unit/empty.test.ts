@@ -1,4 +1,4 @@
-import { QuoteRequest } from "../../model";
+import { QuoteRequest } from "../../strategyV2/model";
 
 describe("Empty tests", () => {
   describe("Test", () => {

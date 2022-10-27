@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import MultiCallAbi from "../../abi/Multicall.json";
-import { Multicall } from "../../abi/types";
+import MultiCallAbi from "../../../abi/Multicall.json";
+import { Multicall } from "../../../abi/types";
 import simpleRpcProvider from "./simpleRpcProvider";
 
 const getContract = (abi: ethers.ContractInterface, address: string) => {
