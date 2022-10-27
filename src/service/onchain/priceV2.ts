@@ -3,9 +3,12 @@ import { multicallv2 } from "../../utils/onchain/multicall";
 import { PairReserves } from "../../model/onchain";
 import PairAbi from "../../abi/Pair.json";
 import { FixedNumber } from "ethers";
+import { MultiCall } from "../../model/multicall";
 
-export const getPairPriceV2 = async (pairs: Pair[]) => {
-  const poolInfoCalls = pairs.map((pair) => ({
+export const getPairPriceV2 = async (
+  pairs: Pair[]
+): Promise<PairWithPrice[]> => {
+  const poolInfoCalls: MultiCall[] = pairs.map((pair) => ({
     address: pair.id,
     name: "getReserves",
   }));
@@ -16,9 +19,7 @@ export const getPairPriceV2 = async (pairs: Pair[]) => {
       requireSuccess: true,
     }
   );
-  console.log(pairV2MultiCallResult.length);
-  console.log(pairV2MultiCallResult[0]);
-  const newPairs = pairs.map((p, i) => {
+  return pairs.map((p, i) => {
     const pairWithPrice = p as PairWithPrice;
     const { _reserve0, _reserve1 } = pairV2MultiCallResult[i];
     pairWithPrice.reserve0 = FixedNumber.from(_reserve0);
@@ -32,9 +33,4 @@ export const getPairPriceV2 = async (pairs: Pair[]) => {
 
     return pairWithPrice;
   });
-  console.log(newPairs[0]);
-  console.log("token0price");
-  console.log(newPairs[0].token0price.toString());
-  console.log("token1price");
-  console.log(newPairs[0].token1price.toString());
 };

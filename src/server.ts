@@ -1,7 +1,7 @@
 import express from "express";
 import * as dotenv from "dotenv";
 import { getPairsV2Combined, getAllPairsStableSwap } from "./service/pairs";
-import { getPairPriceV2 } from "./service/onchain/price";
+import { getPairPriceV2, getPairPriceStableSwap } from "./service/onchain";
 
 dotenv.config();
 
@@ -13,21 +13,18 @@ app.use(express.json());
 
 //TODO add body validation
 app.post("/check-price", async (req, res) => {
-  // try {
-  //   const pairs = await getAllPairsStableSwap();
-  // } catch (error) {
-  //   console.log(`Error STABLE_SWAP`, error);
-  // }
-
-  // try {
-  //   const pairs = await getAllPairsV2();
-  // } catch (error) {
-  //   console.log(`Error PAIRS`, error);
-  // }
+  try {
+    const pairs = await getAllPairsStableSwap();
+    const pairsWithPrice = await getPairPriceStableSwap(pairs);
+    console.log(pairsWithPrice[0]);
+  } catch (error) {
+    console.log(`Error STABLE_SWAP`, error);
+  }
 
   try {
-    const poorPairs = await getPairsV2Combined();
-    await getPairPriceV2(poorPairs);
+    const pairs = await getPairsV2Combined();
+    const pairsWithPrice = await getPairPriceV2(pairs);
+    console.log(pairsWithPrice[0]);
   } catch (error) {
     console.log(`Error SF`, error);
   }
