@@ -4,6 +4,7 @@ import StableSwapPairAbi from "../../../abi/StableSwapPair.json";
 import { BigNumber, FixedNumber } from "ethers";
 import { MultiCall, Pair } from "../../../common/model";
 
+//get_dy(0, 1, amount) means how much (token 1) you will get by swap (token 0) with amount
 export const getPairPriceStableSwap = async (
   pairAddress: string,
   amountIn?: string,
