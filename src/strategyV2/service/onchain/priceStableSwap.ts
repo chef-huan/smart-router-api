@@ -20,7 +20,7 @@ export const getPairPriceStableSwap = async (
     ],
   };
 
-  console.log({ call });
+  // console.log({ call });
 
   const pairStableSwapMultiCallResult = await multicallv2<BigNumber[]>(
     StableSwapPairAbi,

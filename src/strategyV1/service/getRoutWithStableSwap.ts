@@ -45,23 +45,33 @@ export const getRoutWithStableSwap = async (
             (lastStableSwapIndex !== -1 && i - lastStableSwapIndex > 1)
           ) {
             //Calculate route before we found StableSwap pair
+            const fromIndex =
+              lastStableSwapIndex === -1 ? 0 : lastStableSwapIndex + 1;
+            const nextPairSameToken0 = findTokenByAddress(
+              bestRoutePairs[fromIndex + 1],
+              bestRoutePairs[fromIndex].token0.address
+            );
+
+            const tokenFrom = nextPairSameToken0
+              ? bestRoutePairs[fromIndex].token1
+              : bestRoutePairs[fromIndex].token0;
+
             outputAmountWei = await getTradeOutputAmountWei(
               bestRoutePairs,
-              lastStableSwapIndex,
+              tokenFrom,
+              tokenIn || tokenOut,
               outputAmountWei,
-              network,
-              tokenIn || tokenOut
+              network
             );
-            console.log(outputAmountWei);
+            console.log("trade outputAmountWei", outputAmountWei);
           }
         }
 
         //When StableSwap is first pair
         if (tokenIn === null && tokenOut === null) {
           console.log(
-            `bestRoutePairs[i] ${bestRoutePairs[i].token0.symbol}-${bestRoutePairs[i].token1.symbol}`
+            `StableSwap firstPair bestRoutePairs[i] ${bestRoutePairs[i].token0.symbol}-${bestRoutePairs[i].token1.symbol}`
           );
-          console.log(`pair ${pair.token0.symbol}-${pair.token1.symbol}`);
           outputAmountWei = await getPairPriceStableSwap(
             pair.id,
             equalsIgnoreCase(bestRoutePairs[i].token0.address, pair.token0.id)
@@ -90,7 +100,50 @@ export const getRoutWithStableSwap = async (
 
   if (lastStableSwapIndex === -1) {
     outputAmountWei = "0";
-  } else if (lastStableSwapIndex < bestRoutePairs.length) {
+  } else if (lastStableSwapIndex < bestRoutePairs.length - 1) {
+    const stableSwapPair = bestRoutePairs[lastStableSwapIndex];
+    const afterStableSwapPair = bestRoutePairs[lastStableSwapIndex + 1];
+    const lastPair = bestRoutePairs[bestRoutePairs.length - 1];
+    const beforeLastPair = bestRoutePairs[bestRoutePairs.length - 2];
+    let tokenFrom: SdkToken, tokenTo: SdkToken;
+    if (
+      equalsIgnoreCase(
+        stableSwapPair.token0.address,
+        afterStableSwapPair.token0.address
+      ) ||
+      equalsIgnoreCase(
+        stableSwapPair.token0.address,
+        afterStableSwapPair.token1.address
+      )
+    ) {
+      tokenFrom = afterStableSwapPair.token0;
+    } else {
+      tokenFrom = afterStableSwapPair.token1;
+    }
+
+    if (
+      equalsIgnoreCase(
+        lastPair.token0.address,
+        beforeLastPair.token0.address
+      ) ||
+      equalsIgnoreCase(lastPair.token0.address, beforeLastPair.token1.address)
+    ) {
+      tokenTo = lastPair.token1;
+    } else {
+      tokenTo = lastPair.token0;
+    }
+
+    console.log(
+      `lastStableSwapIndex ${lastStableSwapIndex}, tokenTo-${tokenTo.symbol}`
+    );
+
+    await getTradeOutputAmountWei(
+      bestRoutePairs,
+      tokenFrom,
+      tokenTo,
+      outputAmountWei,
+      network
+    );
   }
 
   return { outputAmountWei, pairs: combinePairs };
@@ -98,30 +151,11 @@ export const getRoutWithStableSwap = async (
 
 const getTradeOutputAmountWei = async (
   bestRoutePairs: SdkPair[],
-  lastStableSwapIndex: number,
+  tokenFrom: SdkToken,
+  tokenTo: SdkToken,
   outputAmountWei: string,
-  network: number,
-  tokenTo: SdkToken
+  network: number
 ) => {
-  const fromIndex = lastStableSwapIndex === -1 ? 0 : lastStableSwapIndex + 1;
-
-  const nextPairSameToken0 = findTokenByAddress(
-    bestRoutePairs[fromIndex + 1],
-    bestRoutePairs[fromIndex].token0.address
-  );
-  console.log(
-    `from index: ${fromIndex},  bestRoutePairs[fromIndex] ${bestRoutePairs[fromIndex].token0.symbol}-${bestRoutePairs[fromIndex].token1.symbol}}`
-  );
-  console.log(
-    `bestRoutePairs[fromIndex + 1] ${
-      bestRoutePairs[fromIndex + 1].token0.symbol
-    }-${bestRoutePairs[fromIndex + 1].token1.symbol}}`
-  );
-
-  const tokenFrom = nextPairSameToken0
-    ? bestRoutePairs[fromIndex].token1
-    : bestRoutePairs[fromIndex].token0;
-
   console.log(`tokenFrom ${tokenFrom.symbol}`);
   console.log(`tokenTo ${tokenTo.symbol}`);
 

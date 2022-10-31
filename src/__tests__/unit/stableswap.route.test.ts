@@ -78,6 +78,49 @@ describe("Empty tests", () => {
       },
     ];
 
+    it("First pair in route should be updated by stableswap pair", async () => {
+      const sdkPairs: SdkPair[] = [
+        new SdkPair(busd, hay),
+        new SdkPair(cake, busd),
+      ];
+
+      const getBestRouteFromV2MOCK = jest.spyOn(
+        strategyV1,
+        "getBestRouteFromV2"
+      );
+      getBestRouteFromV2MOCK.mockImplementation(async (request) => {
+        if (
+          equalsIgnoreCase(request.baseToken, bscTokens.busd.address) &&
+          equalsIgnoreCase(request.quoteToken, bscTokens.cake.address)
+        ) {
+          return new Trade<Currency, Currency, TradeType>(
+            new Route<SdkToken, SdkToken>(
+              [new SdkPair(cake, busd)],
+              bscTokens.busd,
+              bscTokens.cake
+            ),
+            busd,
+            TradeType.EXACT_INPUT
+          );
+        }
+        return null;
+      });
+
+      const { pairs, outputAmountWei } = await getRoutWithStableSwap(
+        sdkPairs,
+        stableSwapPairs,
+        18,
+        "50000000000000000000"
+      );
+
+      expect(pairs[0].type).toEqual(PairType.STABLE_SWAP);
+      expect(pairs[1].type).toEqual(PairType.V2);
+      expect(pairs[0].token0.symbol).toEqual("HAY");
+      expect(pairs[0].token1.symbol).toEqual("BUSD");
+      expect(pairs[1].token0.symbol).toEqual("CAKE");
+      expect(pairs[1].token1.symbol).toEqual("BUSD");
+    });
+
     it("Second pair in route should be updated by stableswap pair", async () => {
       const sdkPairs: SdkPair[] = [
         new SdkPair(cake, busd),
@@ -121,49 +164,6 @@ describe("Empty tests", () => {
       expect(pairs[1].token1.symbol).toEqual("BUSD");
     });
 
-    it("First pair in route should be updated by stableswap pair", async () => {
-      const sdkPairs: SdkPair[] = [
-        new SdkPair(busd, hay),
-        new SdkPair(cake, busd),
-      ];
-
-      const getBestRouteFromV2MOCK = jest.spyOn(
-        strategyV1,
-        "getBestRouteFromV2"
-      );
-      getBestRouteFromV2MOCK.mockImplementation(async (request) => {
-        if (
-          equalsIgnoreCase(request.baseToken, bscTokens.cake.address) &&
-          equalsIgnoreCase(request.quoteToken, bscTokens.busd.address)
-        ) {
-          return new Trade<Currency, Currency, TradeType>(
-            new Route<SdkToken, SdkToken>(
-              [new SdkPair(cake, busd)],
-              bscTokens.cake,
-              bscTokens.busd
-            ),
-            cake,
-            TradeType.EXACT_INPUT
-          );
-        }
-        return null;
-      });
-
-      const { pairs, outputAmountWei } = await getRoutWithStableSwap(
-        sdkPairs,
-        stableSwapPairs,
-        18,
-        "50000000000000000000"
-      );
-
-      expect(pairs[0].type).toEqual(PairType.STABLE_SWAP);
-      expect(pairs[1].type).toEqual(PairType.V2);
-      expect(pairs[0].token0.symbol).toEqual("HAY");
-      expect(pairs[0].token1.symbol).toEqual("BUSD");
-      expect(pairs[1].token0.symbol).toEqual("CAKE");
-      expect(pairs[1].token1.symbol).toEqual("BUSD");
-    });
-
     it("Middle pair in route should be updated by stableswap pair", async () => {
       const sdkPairs: SdkPair[] = [
         new SdkPair(bnb, busd),
@@ -176,7 +176,6 @@ describe("Empty tests", () => {
         "getBestRouteFromV2"
       );
       getBestRouteFromV2MOCK.mockImplementation(async (request) => {
-        console.log(request);
         if (
           equalsIgnoreCase(request.baseToken, bscTokens.bnb.address) &&
           equalsIgnoreCase(request.quoteToken, bscTokens.busd.address)
@@ -188,6 +187,20 @@ describe("Empty tests", () => {
               bscTokens.busd
             ),
             bnb,
+            TradeType.EXACT_INPUT
+          );
+        }
+        if (
+          equalsIgnoreCase(request.baseToken, bscTokens.hay.address) &&
+          equalsIgnoreCase(request.quoteToken, bscTokens.cake.address)
+        ) {
+          return new Trade<Currency, Currency, TradeType>(
+            new Route<SdkToken, SdkToken>(
+              [new SdkPair(hay, cake)],
+              bscTokens.hay,
+              bscTokens.cake
+            ),
+            hay,
             TradeType.EXACT_INPUT
           );
         }
