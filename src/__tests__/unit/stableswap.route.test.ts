@@ -1,5 +1,5 @@
 import { Pair, PairType, QuoteRequest } from "../../common/model";
-import * as strategyV1 from "../../strategyV1";
+import * as getAmmPrice from "../../strategyV1/service/getAmmPrice";
 import {
   Currency,
   CurrencyAmount,
@@ -85,7 +85,7 @@ describe("Empty tests", () => {
       ];
 
       const getBestRouteFromV2MOCK = jest.spyOn(
-        strategyV1,
+        getAmmPrice,
         "getBestRouteFromV2"
       );
       getBestRouteFromV2MOCK.mockImplementation(async (request) => {
@@ -128,7 +128,7 @@ describe("Empty tests", () => {
       ];
 
       const getBestRouteFromV2MOCK = jest.spyOn(
-        strategyV1,
+        getAmmPrice,
         "getBestRouteFromV2"
       );
       getBestRouteFromV2MOCK.mockImplementation(async (request) => {
@@ -172,7 +172,7 @@ describe("Empty tests", () => {
       ];
 
       const getBestRouteFromV2MOCK = jest.spyOn(
-        strategyV1,
+        getAmmPrice,
         "getBestRouteFromV2"
       );
       getBestRouteFromV2MOCK.mockImplementation(async (request) => {
@@ -237,7 +237,7 @@ describe("Empty tests", () => {
       ];
 
       const getBestRouteFromV2MOCK = jest.spyOn(
-        strategyV1,
+        getAmmPrice,
         "getBestRouteFromV2"
       );
       getBestRouteFromV2MOCK.mockImplementation(async (request) => {

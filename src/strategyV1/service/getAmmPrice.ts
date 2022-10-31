@@ -14,14 +14,17 @@ import {
   ADDITIONAL_BASES,
   BASES_TO_CHECK_TRADES_AGAINST,
   BETTER_TRADE_LESS_HOPS_THRESHOLD,
+  bscTokens,
   CUSTOM_BASES,
 } from "../config";
 import { getPairs, PairState } from "../utils/getPairs";
 import { wrappedCurrency } from "../utils/wrappedCurrency";
+import { QuoteRequest } from "../../common/model";
+import { equalsIgnoreCase } from "../../common/utils/helpers";
 
 // import { useUnsupportedTokens, useWarningTokens } from "./Tokens";
 
-export async function getAllCommonPairs(
+async function getAllCommonPairs(
   currencyA?: Currency,
   currencyB?: Currency
 ): Promise<Pair[]> {
@@ -125,7 +128,7 @@ const MAX_HOPS = 3;
 /**
  * Returns the best trade for the exact amount of tokens in to the given token out
  */
-export async function getTradeExactIn(
+async function getTradeExactIn(
   currencyAmountIn?: CurrencyAmount<Currency>,
   currencyOut?: Currency,
   singleHopOnly?: boolean
@@ -171,7 +174,7 @@ export async function getTradeExactIn(
 /**
  * Returns the best trade for the token in to the exact amount of token out
  */
-export async function getTradeExactOut(
+async function getTradeExactOut(
   currencyIn?: Currency,
   currencyAmountOut?: CurrencyAmount<Currency>,
   singleHopOnly?: boolean
@@ -212,6 +215,50 @@ export async function getTradeExactOut(
   }
   return null;
 }
+
+export const getBestRouteFromV2 = async (
+  request: QuoteRequest
+): Promise<Trade<Currency, Currency, TradeType> | null> => {
+  const isTradeIn = request.baseTokenAmount !== undefined;
+  const tokenIn = findTokenInConfig(request.baseToken);
+  const tokenOut = findTokenInConfig(request.quoteToken);
+
+  console.log(tokenIn.name, tokenOut.name, isTradeIn);
+
+  if (isTradeIn) {
+    if (tokenIn) {
+      const input = CurrencyAmount.fromRawAmount(
+        tokenIn,
+        request.baseTokenAmount
+      ); //Amount should be in decimal
+      return await getTradeExactIn(input, tokenOut);
+    } else {
+      console.log(`Token not found ${request.baseToken}`);
+    }
+  } else {
+    if (tokenIn) {
+      const input = CurrencyAmount.fromRawAmount(
+        tokenOut,
+        request.quoteTokenAmount
+      ); //Amount should be in decimal
+      return await getTradeExactOut(tokenIn, input);
+    } else {
+      console.log(`Token not found ${request.quoteToken}`);
+    }
+  }
+};
+
+const findTokenInConfig = (address: string): Token => {
+  let found;
+  for (const key of Object.keys(bscTokens)) {
+    const token: Token = bscTokens[key];
+    if (token && equalsIgnoreCase(token.address, address)) {
+      found = token;
+      break;
+    }
+  }
+  return found;
+};
 
 // export function useIsTransactionUnsupported(
 //   currencyIn?: Currency,

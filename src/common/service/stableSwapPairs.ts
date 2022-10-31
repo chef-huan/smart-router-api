@@ -75,22 +75,12 @@ export const getAllPairsStableSwap = async (): Promise<Pair[]> => {
   let pairs: Pair[] = [];
   let pairsPage = await getPairsFirstPage();
   pairs = pairs.concat(pairsPage);
-  console.log(
-    `All Fetch ${pairs.length}, Last: ${pairs[pairs.length - 1].id}, Url:${
-      SUBGRAPH_URL.STABLE_SWAP
-    }`
-  );
 
   while (pairsPage.length === 1000) {
     pairsPage = await getPairsNextPages(
       pairs[pairs.length - 1].trackedReserveBNB
     );
     pairs = pairs.concat(pairsPage);
-    console.log(
-      `All Fetch ${pairs.length}, Last: ${pairs[pairs.length - 1].id}, Url:${
-        SUBGRAPH_URL.STABLE_SWAP
-      }`
-    );
   }
 
   return pairs.map((pair) => {

@@ -8,6 +8,8 @@ import {
   getPairPriceV2,
   getPairsPriceStableSwap,
 } from "./strategyV2/service/onchain";
+import { getBestRoute } from "./strategyV1";
+import { QuoteRequest } from "./common/model";
 
 dotenv.config();
 
@@ -40,7 +42,9 @@ app.post("/v2/check-price", async (req, res) => {
 
 //TODO add body validation
 app.post("/v1/check-price", async (req, res) => {
-  res.status(200).json({ message: "done" });
+  const request: QuoteRequest = JSON.parse(JSON.stringify(req.body));
+  const response = await getBestRoute(request);
+  res.status(200).json(response);
 });
 
 app.listen(process.env.PORT || 8080, () => {

@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 import { infoClient } from "../../../common/utils/subgraph/subgraphClient";
 import { SUBGRAPH_URL } from "../../../common/utils/constants";
-import { Pair, PairQueryResponse } from "../../model/pairs";
-import { PairType } from "../../../common/model";
+import { PairQueryResponse } from "../../model/pairs";
+import { Pair, PairType } from "../../../common/model";
 
 const getPairsFirstPage = async (): Promise<Pair[]> => {
   const { data } = await infoClient(SUBGRAPH_URL.STREAMING_FAST_V2)

@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 import { infoClient } from "../../../common/utils/subgraph/subgraphClient";
 import { SUBGRAPH_URL } from "../../../common/utils/constants";
-import { Pair, PairQueryResponse } from "../../model/pairs";
-import { PairType } from "../../../common/model";
+import { PairQueryResponse } from "../../model/pairs";
+import { Pair, PairType } from "../../../common/model";
 
 export const getPairsPagesById = async (ids: string[]) => {
   const { data } = await infoClient(

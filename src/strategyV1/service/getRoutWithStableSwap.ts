@@ -1,8 +1,8 @@
 import { Pair as SdkPair, Token as SdkToken } from "@pancakeswap/sdk";
 import { fromSdkPair, Pair, QuoteRequest } from "../../common/model";
-import { getBestRouteFromV2, isPairsEquals } from "../index";
 import { getPairPriceStableSwap } from "../../strategyV2/service/onchain";
 import { equalsIgnoreCase } from "../../common/utils/helpers";
+import { getBestRouteFromV2 } from "./getAmmPrice";
 
 export type Result = {
   outputAmountWei: string;
@@ -191,4 +191,20 @@ const findTokenByAddress = (pair: SdkPair, tokenAddress: string): SdkToken => {
   if (equalsIgnoreCase(pair.token1.address, tokenAddress)) {
     return pair.token1;
   }
+};
+
+const isPairsEquals = (pairA: SdkPair, pairB: Pair) => {
+  if (
+    equalsIgnoreCase(pairA.token1.address, pairB.token1.id) &&
+    equalsIgnoreCase(pairA.token0.address, pairB.token0.id)
+  ) {
+    return true;
+  }
+  if (
+    equalsIgnoreCase(pairA.token1.address, pairB.token0.id) &&
+    equalsIgnoreCase(pairA.token0.address, pairB.token1.id)
+  ) {
+    return true;
+  }
+  return false;
 };

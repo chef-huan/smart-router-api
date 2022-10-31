@@ -1,65 +1,30 @@
-import { QuoteRequest, Pair } from "../common/model";
-import { getTradeExactIn } from "./service/getAmmPrice";
-import {
-  Currency,
-  CurrencyAmount,
-  Pair as SdkPair,
-  Token,
-  Trade,
-  TradeType,
-} from "@pancakeswap/sdk";
-import { bscTokens } from "./config";
-import { equalsIgnoreCase } from "../common/utils/helpers";
+import { fromSdkPair, QuoteRequest } from "../common/model";
+import { getBestRouteFromV2 } from "./service/getAmmPrice";
+import { getRoutWithStableSwap, Result } from "./service/getRoutWithStableSwap";
+import { getAllPairsStableSwap } from "../common/service/stableSwapPairs";
+import { FixedNumber } from "ethers";
 
-export const isPairsEquals = (pairA: SdkPair, pairB: Pair) => {
+export const getBestRoute = async (request: QuoteRequest): Promise<Result> => {
+  const bestRouteV2 = await getBestRouteFromV2(request);
+  console.log(bestRouteV2.inputAmount.numerator.toString());
+
+  const stableSwapPairs = await getAllPairsStableSwap();
+  const bestStableSwap = await getRoutWithStableSwap(
+    bestRouteV2.route.pairs,
+    stableSwapPairs,
+    request.networkId,
+    bestRouteV2.inputAmount.numerator.toString()
+  );
+
   if (
-    equalsIgnoreCase(pairA.token1.address, pairB.token1.id) &&
-    equalsIgnoreCase(pairA.token0.address, pairB.token0.id)
+    FixedNumber.from(bestRouteV2.outputAmount.numerator.toString()) >
+    FixedNumber.from(bestStableSwap.outputAmountWei)
   ) {
-    return true;
-  }
-  if (
-    equalsIgnoreCase(pairA.token1.address, pairB.token0.id) &&
-    equalsIgnoreCase(pairA.token0.address, pairB.token1.id)
-  ) {
-    return true;
-  }
-  return false;
-};
-
-export const getBestRouteFromV2 = async (
-  request: QuoteRequest
-): Promise<Trade<Currency, Currency, TradeType> | null> => {
-  const isTradeIn = request.baseTokenAmount !== undefined;
-  const tokenIn = findTokenInConfig(request.baseToken);
-  const tokenOut = findTokenInConfig(request.quoteToken);
-  console.log(tokenIn.name, tokenOut.name, isTradeIn);
-
-  if (isTradeIn) {
-    if (tokenIn) {
-      const input = CurrencyAmount.fromRawAmount(
-        tokenIn,
-        request.baseTokenAmount
-      ); //Amount should be in decimal
-      return await getTradeExactIn(input, tokenOut);
-    }
+    return {
+      outputAmountWei: bestRouteV2.outputAmount.numerator.toString(),
+      pairs: bestRouteV2.route.pairs.map((pair) => fromSdkPair(pair)),
+    };
   } else {
-    const input = CurrencyAmount.fromRawAmount(
-      tokenOut,
-      request.quoteTokenAmount
-    ); //Amount should be in decimal
-    return await getTradeExactIn(input, tokenIn);
+    return bestStableSwap;
   }
-};
-
-const findTokenInConfig = (address: string): Token => {
-  let found;
-  for (const key of Object.keys(bscTokens)) {
-    const token: Token = bscTokens[key];
-    if (token && token.address.toLowerCase() === address.toLowerCase()) {
-      found = token;
-      break;
-    }
-  }
-  return found;
 };
