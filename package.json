@@ -7,7 +7,7 @@
     "build": "tsc",
     "clean": "rm -rf build",
     "start": "tsc && node ./build/server.js",
-    "start:dev": "nodemon src/server.ts",
+    "start:dev": "nodemon --exec \"node --require ts-node/register --inspect=8082 src/server.ts\"",
     "lint": "tsc --noEmit && TIMING=1 eslint src/**/*.ts* --fix",
     "test": "NODE_ENV=test jest --verbose --runInBand",
     "typechain": "typechain --out-dir src/abi/types --target=ethers-v5 \"src/abi/*.json\""
