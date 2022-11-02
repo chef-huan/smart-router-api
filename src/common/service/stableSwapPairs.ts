@@ -1,5 +1,6 @@
 import { gql } from "graphql-request";
 import { Pair as SdkPair, ChainId, Token } from "@pancakeswap/sdk";
+import { getAddress } from '@ethersproject/address';
 
 import { infoClient } from "../utils/subgraph/subgraphClient";
 import { SUBGRAPH_URL } from "../utils/constants";
@@ -118,15 +119,15 @@ export const getAllPairsStableSwapRefactor = async (chainId: ChainId): Promise<S
   const currencies: [Token, Token][] = pairs.map(pair => ([
     new Token(
       chainId,
-      pair.token0.id,
-      pair.token0.decimals,
+      getAddress(pair.token0.id),
+      Number(pair.token0.decimals),
       pair.token0.symbol,
       pair.token0.name,
     ),
     new Token(
       chainId,
-      pair.token1.id,
-      pair.token1.decimals,
+      getAddress(pair.token1.id),
+      Number(pair.token1.decimals),
       pair.token1.symbol,
       pair.token1.name,
     ),
