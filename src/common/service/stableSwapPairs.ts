@@ -6,7 +6,7 @@ import { infoClient } from "../utils/subgraph/subgraphClient";
 import { SUBGRAPH_URL } from "../utils/constants";
 import { PairQueryResponse } from "../../strategyV2/model/pairs";
 import { Pair, PairType } from "../model";
-import { getPairs, PairState } from "../../strategyV1/utils/getPairs";
+import { getPairs } from "../../strategyV1/utils/getPairs";
 
 const getPairsFirstPage = async (): Promise<Pair[]> => {
   const { data } = await infoClient(SUBGRAPH_URL.STABLE_SWAP)
@@ -139,11 +139,10 @@ export const getAllPairsStableSwapRefactor = async (chainId: ChainId): Promise<S
 
   const pairStates = await getPairs(currencies, chainId);
   return pairStates
-    .map(([state, pair], index) => {
-      const stablePair: StableSwapPair = pair as StableSwapPair;
+    .map(([, pair], index) => {
+      const stablePair = pair as StableSwapPair;
       stablePair.stableSwapAddress = pairs[index].id;
-      return [state, stablePair];
+      return stablePair;
     })
-    .filter(([state]) => (state === PairState.EXISTS))
-    .map(([, pair]) => pair) as StableSwapPair[];
+    .filter(pair => !!pair) as StableSwapPair[];
 };
