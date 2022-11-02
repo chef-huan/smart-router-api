@@ -1,12 +1,11 @@
 import { gql } from "graphql-request";
-import { Pair as SdkPair, ChainId, Token } from "@pancakeswap/sdk";
+import { Pair as SdkPair, ChainId, Token, CurrencyAmount } from "@pancakeswap/sdk";
 import { getAddress } from '@ethersproject/address';
 
 import { infoClient } from "../utils/subgraph/subgraphClient";
 import { SUBGRAPH_URL } from "../utils/constants";
 import { PairQueryResponse } from "../../strategyV2/model/pairs";
 import { Pair, PairType } from "../model";
-import { getPairs } from "../../strategyV1/utils/getPairs";
 
 const getPairsFirstPage = async (): Promise<Pair[]> => {
   const { data } = await infoClient(SUBGRAPH_URL.STABLE_SWAP)
@@ -120,29 +119,30 @@ export const getAllPairsStableSwapRefactor = async (chainId: ChainId): Promise<S
     pairs = pairs.concat(pairsPage);
   }
 
-  const currencies: [Token, Token][] = pairs.map(pair => ([
-    new Token(
-      chainId,
-      getAddress(pair.token0.id),
-      Number(pair.token0.decimals),
-      pair.token0.symbol,
-      pair.token0.name,
-    ),
-    new Token(
-      chainId,
-      getAddress(pair.token1.id),
-      Number(pair.token1.decimals),
-      pair.token1.symbol,
-      pair.token1.name,
-    ),
-  ]));
-
-  const pairStates = await getPairs(currencies, chainId);
-  return pairStates
-    .map(([, pair], index) => {
-      const stablePair = pair as StableSwapPair;
-      stablePair.stableSwapAddress = pairs[index].id;
-      return stablePair;
-    })
-    .filter(pair => !!pair) as StableSwapPair[];
+  return pairs.map(p => {
+    const pair = new SdkPair(
+      CurrencyAmount.fromRawAmount(
+        new Token(
+          chainId,
+          getAddress(p.token0.id),
+          Number(p.token0.decimals),
+          p.token0.symbol,
+          p.token0.name,
+        ),
+        '0',
+      ),
+      CurrencyAmount.fromRawAmount(
+        new Token(
+          chainId,
+          getAddress(p.token1.id),
+          Number(p.token1.decimals),
+          p.token1.symbol,
+          p.token1.name,
+        ),
+        '0',
+      ),
+    );
+    (pair as StableSwapPair).stableSwapAddress = p.id;
+    return pair as StableSwapPair;
+  });
 };
