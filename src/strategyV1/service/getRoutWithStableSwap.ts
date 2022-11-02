@@ -165,7 +165,7 @@ const getTradeOutputAmountWei = async (
   return trade.outputAmount.numerator.toString();
 };
 
-const getQuoteRequest = (
+export const getQuoteRequest = (
   networkId: number,
   inputAmount: string,
   pairTokenA: SdkToken,
