@@ -24,11 +24,13 @@ const getPairsFirstPage = async (): Promise<Pair[]> => {
           id
           symbol
           name
+          decimals
         }
         token1 {
           id
           symbol
           name
+          decimals
         }
       }
     }
@@ -117,16 +119,14 @@ export const getAllPairsStableSwapRefactor = async (chainId: ChainId): Promise<S
     new Token(
       chainId,
       pair.token0.id,
-      // FIXME should get the decimal from subgraph
-      18,
+      pair.token0.decimals,
       pair.token0.symbol,
       pair.token0.name,
     ),
     new Token(
       chainId,
       pair.token1.id,
-      // FIXME should get the decimal from subgraph
-      18,
+      pair.token1.decimals,
       pair.token1.symbol,
       pair.token1.name,
     ),
