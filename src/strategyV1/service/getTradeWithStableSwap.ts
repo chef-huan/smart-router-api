@@ -14,8 +14,16 @@ export async function getTradeWithStableSwap<TInput extends Currency, TOutput ex
   outputAmount: CurrencyAmount<TOutput>;
   pairs: (Pair | StableSwapPair)[];
 }> {
-  const findStableSwapPair = (pair: Pair) => stableSwapPairs.find(p => isSamePair(p, pair));
   const { inputAmount, route } = baseTrade;
+  // Early return if there's no stableswap available
+  if (!stableSwapPairs.length) {
+    return {
+      outputAmount: baseTrade.outputAmount,
+      pairs: route.pairs,
+    };
+  }
+
+  const findStableSwapPair = (pair: Pair) => stableSwapPairs.find(p => isSamePair(p, pair));
 
   let outputAmount: CurrencyAmount<Currency> = inputAmount;
   let outputToken: Currency = inputAmount.currency;

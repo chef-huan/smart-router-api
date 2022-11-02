@@ -104,7 +104,11 @@ export function isStableSwapPair(pair: SdkPair): pair is StableSwapPair {
 }
 
 export const getAllPairsStableSwapRefactor = async (chainId: ChainId): Promise<StableSwapPair[]> => {
-  // FIXME should use chain id to get all pairs reside on the specified network
+  // Stable swap is only supported on BSC chain
+  if (chainId !== ChainId.BSC) {
+    return [];
+  }
+
   let pairs: Pair[] = [];
   let pairsPage = await getPairsFirstPage();
   pairs = pairs.concat(pairsPage);
