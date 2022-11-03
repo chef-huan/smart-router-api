@@ -9,34 +9,39 @@
     "start": "tsc && node ./build/server.js",
     "start:dev": "nodemon --exec \"node --require ts-node/register --inspect=8082 src/server.ts\"",
     "lint": "tsc --noEmit && TIMING=1 eslint src/**/*.ts* --fix",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json}\"",
+    "format:check:staged": "lint-staged",
     "test": "NODE_ENV=test jest --verbose --runInBand",
-    "typechain": "typechain --out-dir src/abi/types --target=ethers-v5 \"src/abi/*.json\""
+    "typechain": "typechain --out-dir src/abi/types --target=ethers-v5 \"src/abi/*.json\"",
+    "prepare": "husky install"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@pancakeswap/sdk": "^3.0.0",
     "dotenv": "^16.0.1",
-    "express": "^4.18.1",
     "ethers": "^5.7.2",
+    "express": "^4.18.1",
     "graphql": "^15.5.0",
     "graphql-request": "^3.5.0",
+    "lodash": "^4.17.21",
     "nodemon": "^2.0.19",
     "ts-node": "^10.9.1",
-    "lodash": "^4.17.21",
-    "@pancakeswap/sdk": "^3.0.0",
     "typechain": "^7.0.0"
   },
   "devDependencies": {
     "@typechain/ethers-v5": "^9.0.0",
     "@types/express": "^4.17.13",
+    "@types/jest": "^29.2.0",
     "@types/lodash": "^4.14.178",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "eslint": "^7.32.0",
-    "prettier": "latest",
-    "typescript": "^4.5.3",
-    "@types/jest": "^29.2.0",
+    "husky": "^8.0.1",
+    "jest": "^29.2.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
     "ts-jest": "^29.0.3",
-    "jest": "^29.2.1"
+    "typescript": "^4.5.3"
   }
 }
