@@ -1,5 +1,5 @@
-import { PairType } from "./pairType";
-import { Pair as SdkPair } from "@pancakeswap/sdk";
+import { PairType } from './pairType';
+import { Pair as SdkPair, Token as SdkToken } from '@pancakeswap/sdk';
 
 export interface Pair {
   id: string;
@@ -35,6 +35,25 @@ export const fromSdkPair = (pair: SdkPair): Pair => {
       symbol: pair.token1.symbol,
       name: pair.token1.name,
       decimals: pair.token1.decimals,
+    },
+    type: PairType.V2,
+  };
+};
+
+export const fromSdkTokens = (token0: SdkToken, token1: SdkToken): Pair => {
+  return {
+    id: `${SdkPair.getAddress(token0, token1)}`,
+    token0: {
+      id: token0.address,
+      symbol: token0.symbol,
+      name: token0.name,
+      decimals: token0.decimals,
+    },
+    token1: {
+      id: token1.address,
+      symbol: token1.symbol,
+      name: token1.name,
+      decimals: token1.decimals,
     },
     type: PairType.V2,
   };

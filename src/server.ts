@@ -1,15 +1,10 @@
-import express from "express";
-import * as dotenv from "dotenv";
-import {
-  getPairsV2Combined,
-  getAllPairsStableSwap,
-} from "./strategyV2/service/pairs";
-import {
-  getPairPriceV2,
-  getPairsPriceStableSwap,
-} from "./strategyV2/service/onchain";
-import { getBestRoute } from "./strategyV1";
-import { QuoteRequest } from "./common/model";
+import express from 'express';
+import * as dotenv from 'dotenv';
+import { getPairsV2Combined, getAllPairsStableSwap } from './strategyV2/service/pairs';
+import { getPairPriceV2, getPairsPriceStableSwap } from './strategyV2/service/onchain';
+import { getBestRoute } from './strategyV1';
+import { QuoteRequest } from './common/model';
+import { getRouteAndType } from './strategyV1/service/getRouteAndType';
 
 dotenv.config();
 
@@ -20,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 //TODO add body validation
-app.post("/v2/check-price", async (req, res) => {
+app.post('/v2/check-price', async (req, res) => {
   try {
     const pairs = await getAllPairsStableSwap();
     const pairsWithPrice = await getPairsPriceStableSwap(pairs);
@@ -37,13 +32,20 @@ app.post("/v2/check-price", async (req, res) => {
     console.log(`Error SF`, error);
   }
 
-  res.status(200).json({ message: "done" });
+  res.status(200).json({ message: 'done' });
 });
 
 //TODO add body validation
-app.post("/v1/check-price", async (req, res) => {
+app.post('/v1/check-price', async (req, res) => {
   const request: QuoteRequest = JSON.parse(JSON.stringify(req.body));
   const response = await getBestRoute(request);
+  res.status(200).json(response);
+});
+
+//TODO add body validation
+app.post('/v1/check-trade', async (req, res) => {
+  const request: QuoteRequest = JSON.parse(JSON.stringify(req.body));
+  const response = await getRouteAndType(request);
   res.status(200).json(response);
 });
 
